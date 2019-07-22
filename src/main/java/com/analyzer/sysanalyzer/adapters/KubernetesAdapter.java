@@ -24,7 +24,8 @@ import java.util.Optional;
 public class KubernetesAdapter implements ExternalSystemAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesAdapter.class);
     private static final String DEFAULT_NAMESPACE = "default";
-    public static final String MEMORY_ATTRIBUTE = "memory";
+    private static final String MEMORY_ATTRIBUTE = "memory";
+    private static final String TEST_DEPLOYMENT_NAME = "docker-demo";
     private CoreV1Api api;
     private ExtensionsV1beta1Api extensionV1Api;
 
@@ -55,7 +56,7 @@ public class KubernetesAdapter implements ExternalSystemAdapter {
         try {
             V1PodList kubePodes = this.api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null);
             kubePodes.getItems().forEach(item -> {
-                ClusterNodeStatistics nodeStatistics = null;
+                ClusterNodeStatistics nodeStatistics;
                 try {
                     nodeStatistics = convertNodeStatisticFromPod(item);
                     if (nodeStatistics != null) {
@@ -176,9 +177,8 @@ public class KubernetesAdapter implements ExternalSystemAdapter {
     /**
      * Scale up/down the number of pod in Deployment
      *
-     * @param deploymentName
-     * @param numberOfReplicas
-     * @throws ApiException
+     * @param deploymentName - name of deployment
+     * @param numberOfReplicas - required number of replicas deployment
      */
     private void scaleDeployment(String deploymentName, int numberOfReplicas)
             throws ApiException {
@@ -224,6 +224,6 @@ public class KubernetesAdapter implements ExternalSystemAdapter {
 
     private String calcDeploymentNameByServiceName(String serviceName) {
         //TODO: Using serviceName
-        return "docker-demo";
+        return TEST_DEPLOYMENT_NAME;
     }
 }
